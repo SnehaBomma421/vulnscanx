@@ -27,10 +27,14 @@ export default function Dashboard() {
       });
       const data = await res.json();
       if (res.ok) {
-        setHistory(data);
+        setHistory(Array.isArray(data) ? data : []);
+      } else {
+        throw new Error(data.message || 'Failed to fetch scan history');
       }
     } catch (err) {
       console.error('Failed to fetch history', err);
+      // Ensure we have an empty array if failure occurs to avoid map errors
+      setHistory([]);
     } finally {
       setIsLoadingHistory(false);
     }
@@ -138,10 +142,10 @@ export default function Dashboard() {
           <div style={{ marginBottom: '4rem' }}>
             <h3 className="section-title">Scan Report: {activeReport.target}</h3>
             <div className="report-grid">
-              {activeReport.issues.map((issue, idx) => (
+              {(activeReport.issues || []).map((issue, idx) => (
                 <ReportCard key={idx} issue={issue} />
               ))}
-              {activeReport.issues.length === 0 && (
+              {(!activeReport.issues || activeReport.issues.length === 0) && (
                 <div style={{ color: 'var(--neon-green)', fontFamily: 'Fira Code' }}>
                   [+] No vulnerabilities detected. Target appears secure.
                 </div>
@@ -165,11 +169,11 @@ export default function Dashboard() {
                 <div className="history-item" key={scan._id}>
                   <div className="target">Target: {scan.target}</div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <span className={`badge badge-${scan.overallRisk.toLowerCase()}`}>
-                      Risk: {scan.overallRisk}
+                    <span className={`badge badge-${(scan.overallRisk || 'safe').toLowerCase()}`}>
+                      Risk: {scan.overallRisk || 'Safe'}
                     </span>
                     <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-                      {new Date(scan.createdAt).toLocaleString()}
+                      {scan.createdAt ? new Date(scan.createdAt).toLocaleString() : 'N/A'}
                     </span>
                     <button 
                       className="btn" 

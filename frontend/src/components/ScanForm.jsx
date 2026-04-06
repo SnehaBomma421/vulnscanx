@@ -24,8 +24,13 @@ export default function ScanForm({ onScanComplete }) {
     }, 300);
 
     try {
+      const apiUrl = import.meta.env.VITE_API_URL;
+      if (!apiUrl) {
+        throw new Error('VITE_API_URL is not defined in environment variables');
+      }
+
       const token = localStorage.getItem('token');
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/scan/analyze`, {
+      const res = await fetch(`${apiUrl}/api/scan/analyze`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

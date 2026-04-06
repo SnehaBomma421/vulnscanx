@@ -7,7 +7,12 @@ function getBlobServiceClient() {
   const connStr = process.env.AZURE_STORAGE_CONNECTION_STRING;
 
   if (!connStr) {
-    throw new Error('AZURE_STORAGE_CONNECTION_STRING is not set in .env');
+    throw new Error('AZURE_STORAGE_CONNECTION_STRING is not set in environment variables');
+  }
+
+  // Basic validation to prevent immediate crash if string is malformed
+  if (!connStr.includes('AccountName=') || !connStr.includes('AccountKey=')) {
+    throw new Error('AZURE_STORAGE_CONNECTION_STRING appears to be malformed. Ensure it starts with "DefaultEndpointsProtocol..." and contains AccountName/AccountKey.');
   }
 
   return BlobServiceClient.fromConnectionString(connStr);
