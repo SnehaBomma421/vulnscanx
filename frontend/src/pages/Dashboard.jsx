@@ -22,7 +22,7 @@ export default function Dashboard() {
     setIsLoadingHistory(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:5000/api/scan/history', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/scan/history`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
@@ -42,7 +42,7 @@ export default function Dashboard() {
     
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:5000/api/scan/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/scan/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -66,7 +66,7 @@ export default function Dashboard() {
     try {
       console.log(`[Frontend] Initiating download for scan: ${scanId}`);
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:5000/api/scans/${scanId}/download`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/scans/${scanId}/download`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
