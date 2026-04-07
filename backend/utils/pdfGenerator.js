@@ -75,6 +75,77 @@ function generatePDFReport(scanData) {
 
       doc.moveDown(2);
 
+      // --- Analytics Dashboard (PDF Rendering) ---
+      doc
+        .fillColor('#00aaff')
+        .fontSize(16)
+        .font('Helvetica-Bold')
+        .text('Security Posture Analytics');
+        
+      doc.moveDown(0.5);
+
+      const highRiskCount = scanData.issues.filter(i => i.risk === 'High').length;
+      const medRiskCount = scanData.issues.filter(i => i.risk === 'Medium').length;
+      const lowRiskCount = scanData.issues.filter(i => i.risk === 'Low').length;
+      const totalIssues = scanData.issues.length;
+
+      // Draw Summary Boxes
+      const boxY = doc.y;
+      const boxWidth = 100;
+      const boxSpacing = 20;
+      const startX = 50;
+
+      const stats = [
+        { label: 'TOTAL', value: totalIssues, color: '#00aaff' },
+        { label: 'HIGH', value: highRiskCount, color: '#ff003c' },
+        { label: 'MEDIUM', value: medRiskCount, color: '#ffaa00' },
+        { label: 'LOW', value: lowRiskCount, color: '#00ff41' }
+      ];
+
+      stats.forEach((stat, index) => {
+        const xPos = startX + index * (boxWidth + boxSpacing);
+        doc.lineWidth(1).strokeColor(stat.color).rect(xPos, boxY, boxWidth, 50).stroke();
+        doc.fillColor('#cccccc').fontSize(10).font('Helvetica').text(stat.label, xPos, boxY + 8, { width: boxWidth, align: 'center' });
+        doc.fillColor(stat.color).fontSize(20).font('Helvetica-Bold').text(stat.value.toString(), xPos, boxY + 22, { width: boxWidth, align: 'center' });
+      });
+
+      doc.y = boxY + 70;
+
+      if (totalIssues > 0) {
+        // Horizontal Stacked Bar Chart
+        doc.fillColor('#ffffff').fontSize(12).font('Helvetica-Bold').text('Risk Distribution:');
+        doc.moveDown(0.5);
+
+        const chartY = doc.y;
+        const maxBarWidth = 460;
+        
+        const highWidth = (highRiskCount / totalIssues) * maxBarWidth;
+        const medWidth = (medRiskCount / totalIssues) * maxBarWidth;
+        const lowWidth = (lowRiskCount / totalIssues) * maxBarWidth;
+
+        let currentX = 50;
+        if (highRiskCount > 0) { doc.fillColor('#ff003c').rect(currentX, chartY, highWidth, 20).fill(); currentX += highWidth; }
+        if (medRiskCount > 0) { doc.fillColor('#ffaa00').rect(currentX, chartY, medWidth, 20).fill(); currentX += medWidth; }
+        if (lowRiskCount > 0) { doc.fillColor('#00ff41').rect(currentX, chartY, lowWidth, 20).fill(); }
+
+        doc.y = chartY + 25;
+        doc.fontSize(10).font('Helvetica');
+        
+        const legendItems = [];
+        if (highRiskCount > 0) legendItems.push({ label: `High (${Math.round((highRiskCount/totalIssues)*100)}%)`, color: '#ff003c' });
+        if (medRiskCount > 0) legendItems.push({ label: `Medium (${Math.round((medRiskCount/totalIssues)*100)}%)`, color: '#ffaa00' });
+        if (lowRiskCount > 0) legendItems.push({ label: `Low (${Math.round((lowRiskCount/totalIssues)*100)}%)`, color: '#00ff41' });
+
+        let legendX = 50;
+        legendItems.forEach((item, index) => {
+          doc.fillColor(item.color).text(item.label, legendX, doc.y, { continued: index < legendItems.length - 1 });
+          legendX = doc.x + 10;
+        });
+        doc.text('');
+      }
+
+      doc.moveDown(2);
+
       // Vulnerabilities Section
       doc
         .fillColor('#ffffff')
