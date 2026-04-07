@@ -129,6 +129,7 @@ function generatePDFReport(scanData) {
         if (lowRiskCount > 0) { doc.fillColor('#00ff41').rect(currentX, chartY, lowWidth, 20).fill(); }
 
         doc.y = chartY + 25;
+        doc.x = 50;
         doc.fontSize(10).font('Helvetica');
         
         const legendItems = [];
@@ -136,12 +137,11 @@ function generatePDFReport(scanData) {
         if (medRiskCount > 0) legendItems.push({ label: `Medium (${Math.round((medRiskCount/totalIssues)*100)}%)`, color: '#ffaa00' });
         if (lowRiskCount > 0) legendItems.push({ label: `Low (${Math.round((lowRiskCount/totalIssues)*100)}%)`, color: '#00ff41' });
 
-        let legendX = 50;
         legendItems.forEach((item, index) => {
-          doc.fillColor(item.color).text(item.label, legendX, doc.y, { continued: index < legendItems.length - 1 });
-          legendX = doc.x + 10;
+          doc.fillColor(item.color).text(item.label + '     ', { continued: index < legendItems.length - 1 });
         });
-        doc.text('');
+        
+        // No explicit line end is needed because the last item has `continued: false`
       }
 
       doc.moveDown(2);
@@ -191,9 +191,31 @@ function generatePDFReport(scanData) {
             .fillColor('#dddddd')
             .fontSize(10)
             .font('Helvetica-Bold')
-            .text('MITIGATION:', { continued: true })
+            .text('MITIGATION: ', { continued: true })
             .fillColor('#00ff41')
-            .text(` ${issue.mitigation}`);
+            .text(`${issue.mitigation}`);
+
+          if (issue.cwe) {
+            doc.moveDown(0.3);
+            doc
+              .fillColor('#dddddd')
+              .fontSize(10)
+              .font('Helvetica-Bold')
+              .text('CWE REFERENCE: ', { continued: true })
+              .fillColor('#bbbbbb')
+              .text(`${issue.cwe}`);
+          }
+
+          if (issue.technicalDetails) {
+            doc.moveDown(0.3);
+            doc
+              .fillColor('#dddddd')
+              .fontSize(10)
+              .font('Helvetica-Bold')
+              .text('TECHNICAL DETAILS: ', { continued: true })
+              .fillColor('#bbbbbb')
+              .text(`${issue.technicalDetails}`);
+          }
 
           doc.moveDown(1.5);
 

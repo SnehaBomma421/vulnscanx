@@ -33,6 +33,20 @@ export default function ReportCard({ issue }) {
       <div className="report-desc">
         {description}
       </div>
+      
+      {issue.technicalDetails && (
+        <div style={{ marginBottom: '1rem', fontSize: '0.85rem', color: '#aaaaaa', borderLeft: '2px solid var(--border-muted)', paddingLeft: '0.5rem' }}>
+          <strong>Technical Details:</strong><br/>
+          {issue.technicalDetails}
+        </div>
+      )}
+
+      {issue.cwe && (
+        <div style={{ marginBottom: '1rem', fontSize: '0.8rem', color: 'var(--neon-purple)', fontFamily: 'Fira Code' }}>
+          [{issue.cwe}]
+        </div>
+      )}
+
       <div className="report-mitigation">
         <strong>Mitigation:</strong><br/>
         {mitigation}

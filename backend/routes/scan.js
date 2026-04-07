@@ -29,7 +29,9 @@ const analyzeTarget = (target) => {
       title: 'Missing HTTPS Encryption',
       risk: 'High',
       description: 'Communication with this target is unencrypted. Attackers can intercept sensitive data.',
-      mitigation: 'Implement an SSL/TLS certificate and enforce HTTPS redirection.'
+      mitigation: 'Implement an SSL/TLS certificate and enforce HTTPS redirection.',
+      technicalDetails: 'The host failed to negotiate a TLS handshake. Data intercepted over the network is in plain text. Vulnerable to Man-in-the-Middle (MitM) attacks.',
+      cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
     });
   }
 
@@ -39,7 +41,9 @@ const analyzeTarget = (target) => {
       title: 'Exposed Sensitive Directory',
       risk: 'High',
       description: 'Target URL contains common sensitive keywords suggesting exposed panels or development environments.',
-      mitigation: 'Restrict access to administrative pages using IP whitelisting or VPNs.'
+      mitigation: 'Restrict access to administrative pages using IP whitelisting or VPNs.',
+      technicalDetails: 'Directory bruteforcing or path scanning revealed restricted operational paths. This often leads to unauthorized privilege escalation if default credentials are in use.',
+      cwe: 'CWE-425: Direct Request (Forced Browsing)'
     });
   }
 
@@ -49,7 +53,9 @@ const analyzeTarget = (target) => {
       title: 'Missing Security Headers (HSTS, X-Frame-Options)',
       risk: 'Low',
       description: 'The target lacks modern HTTP security headers, increasing susceptibility to clickjacking or downgrade attacks.',
-      mitigation: 'Configure the web server to append strict security headers to all responses.'
+      mitigation: 'Configure the web server to append strict security headers to all responses.',
+      technicalDetails: 'HTTP response analysis showed absence of Strict-Transport-Security, X-XSS-Protection, and X-Content-Type-Options headers.',
+      cwe: 'CWE-693: Protection Mechanism Failure'
     });
   }
 
@@ -58,7 +64,9 @@ const analyzeTarget = (target) => {
       title: 'Cross-Site Scripting (XSS) Vulnerability (Simulated)',
       risk: 'High',
       description: 'A simulated endpoint appears vulnerable to reflective XSS attacks due to unsanitized input reflection.',
-      mitigation: 'Sanitize all user inputs and implement a strong Content Security Policy (CSP).'
+      mitigation: 'Sanitize all user inputs and implement a strong Content Security Policy (CSP).',
+      technicalDetails: 'Payloads containing HTML tags (<script>alert(1)</script>) were returned exactly as provided in the HTTP response body without proper encoding.',
+      cwe: 'CWE-79: Improper Neutralization of Input During Web Page Generation'
     });
   }
 
@@ -67,7 +75,9 @@ const analyzeTarget = (target) => {
       title: 'Simulated Open Port: 22 (SSH)',
       risk: 'Medium',
       description: 'SSH service appears accessible from the external network, inviting brute force attempts.',
-      mitigation: 'Disable password authentication, mandate key-based auth, and restrict port 22 access.'
+      mitigation: 'Disable password authentication, mandate key-based auth, and restrict port 22 access.',
+      technicalDetails: 'Nmap TCP SYN scan identified port 22 open. The SSH banner implies an outdated OpenSSH version might be running.',
+      cwe: 'CWE-284: Improper Access Control'
     });
   }
 
@@ -76,7 +86,9 @@ const analyzeTarget = (target) => {
       title: 'Outdated Server Software Version',
       risk: 'Medium',
       description: 'The web server is broadcasting an older software version header in its HTTP responses.',
-      mitigation: 'Update the server software and configure it to omit version headers.'
+      mitigation: 'Update the server software and configure it to omit version headers.',
+      technicalDetails: 'The Server header (e.g. Server: Apache/2.4.1) leaks specific version data which can be cross-referenced with public CVE databases.',
+      cwe: 'CWE-200: Exposure of Sensitive Information to an Unauthorized Actor'
     });
   }
 
