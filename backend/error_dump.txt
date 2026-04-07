@@ -1,0 +1,11 @@
+Error: switchToPage(0) out of bounds, current buffer covers pages 1 to 1
+    at PDFDocument.switchToPage (C:\VulnScanX\backend\node_modules\pdfkit\js\pdfkit.js:6109:13)
+    at C:\VulnScanX\backend\utils\pdfGenerator.js:232:13
+    at new Promise (<anonymous>)
+    at generatePDFReport (C:\VulnScanX\backend\utils\pdfGenerator.js:8:10)
+    at testPdf (C:\VulnScanX\backend\test_pdf2.js:72:23)
+    at Object.<anonymous> (C:\VulnScanX\backend\test_pdf2.js:80:1)
+    at Module._compile (node:internal/modules/cjs/loader:1706:14)
+    at Object..js (node:internal/modules/cjs/loader:1839:10)
+    at Module.load (node:internal/modules/cjs/loader:1441:32)
+    at Function._load (node:internal/modules/cjs/loader:1263:12)
