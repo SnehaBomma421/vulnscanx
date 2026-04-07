@@ -219,10 +219,6 @@ function generatePDFReport(scanData) {
 
           doc.moveDown(1.5);
 
-          // Add a page if we are near the bottom
-          if (doc.y > 650) {
-            doc.addPage();
-          }
         });
       }
 
