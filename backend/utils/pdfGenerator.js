@@ -232,8 +232,8 @@ function generatePDFReport(scanData) {
           .text(
             `VulnScanX Security Report - Confidential - Page ${i + 1} of ${pageCount}`,
             50,
-            750,
-            { align: 'center', width: 500 }
+            doc.page.height - 40,
+            { align: 'center', width: 500, lineBreak: false }
           );
       }
 
