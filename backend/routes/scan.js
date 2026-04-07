@@ -6,65 +6,90 @@ const { uploadReport, downloadReport } = require('../utils/azureBlob');
 const { generatePDFReport } = require('../utils/pdfGenerator');
 
 
-// Mock security scanning logic
+const crypto = require('crypto');
+
+// Enhanced Mock security scanning logic
 const analyzeTarget = (target) => {
   const issues = [];
-  let riskScore = 0;
+
+  // Deterministic mock generation based on target URL
+  const hash = crypto.createHash('md5').update(target).digest('hex');
+  const char1 = parseInt(hash[0], 16); // 0-15
+  const char2 = parseInt(hash[1], 16);
+  const char3 = parseInt(hash[2], 16);
+  const char4 = parseInt(hash[3], 16);
 
   const isLocal = target.includes('127.0.0.1') || target.includes('localhost');
   const isIP = /^(?:\d{1,3}\.){3}\d{1,3}$/.test(target);
   const isSecure = target.startsWith('https://');
   
+  // Real check based on protocol
   if (!isSecure && !isLocal && !isIP && target.startsWith('http://')) {
     issues.push({
-      title: 'Missing HTTPS',
+      title: 'Missing HTTPS Encryption',
       risk: 'High',
       description: 'Communication with this target is unencrypted. Attackers can intercept sensitive data.',
       mitigation: 'Implement an SSL/TLS certificate and enforce HTTPS redirection.'
     });
-    riskScore += 3;
   }
 
-  // Simulated open ports based on strings
-  if (target.includes('admin') || target.includes('test')) {
+  // Real check based on keywords
+  if (target.includes('admin') || target.includes('test') || target.includes('dev')) {
     issues.push({
-      title: 'Exposed Admin Panel / Sensitive Path',
-      risk: 'Medium',
-      description: 'Target contains common sensitive keywords suggesting exposed panels.',
-      mitigation: 'Restrict access to admin pages using IP whitelisting or VPNs.'
+      title: 'Exposed Sensitive Directory',
+      risk: 'High',
+      description: 'Target URL contains common sensitive keywords suggesting exposed panels or development environments.',
+      mitigation: 'Restrict access to administrative pages using IP whitelisting or VPNs.'
     });
-    riskScore += 2;
   }
 
-  // Random simulation for realistic feel (based on target length to keep it deterministic per target run in a demo)
-  if (target.length % 2 === 0) {
+  // Simulated checks based on hash ensuring variety across different URLs
+  if (char1 < 7) {
     issues.push({
       title: 'Missing Security Headers (HSTS, X-Frame-Options)',
       risk: 'Low',
-      description: 'The target lacks modern HTTP security headers, making it vulnerable to clickjacking.',
+      description: 'The target lacks modern HTTP security headers, increasing susceptibility to clickjacking or downgrade attacks.',
       mitigation: 'Configure the web server to append strict security headers to all responses.'
     });
-    riskScore += 1;
   }
 
-  if (target.length % 3 === 0) {
+  if (char2 > 12) {
+    issues.push({
+      title: 'Cross-Site Scripting (XSS) Vulnerability (Simulated)',
+      risk: 'High',
+      description: 'A simulated endpoint appears vulnerable to reflective XSS attacks due to unsanitized input reflection.',
+      mitigation: 'Sanitize all user inputs and implement a strong Content Security Policy (CSP).'
+    });
+  }
+
+  if (char3 % 3 === 0) {
     issues.push({
       title: 'Simulated Open Port: 22 (SSH)',
       risk: 'Medium',
-      description: 'SSH service appears accessible from the external network.',
-      mitigation: 'Disable password authentication, use key-based auth, and restrict port 22 access.'
+      description: 'SSH service appears accessible from the external network, inviting brute force attempts.',
+      mitigation: 'Disable password authentication, mandate key-based auth, and restrict port 22 access.'
     });
-    riskScore += 2;
   }
 
-  let overallRisk = 'Safe';
-  if (riskScore >= 3) overallRisk = 'High';
-  else if (riskScore > 0) overallRisk = 'Medium';
-  else overallRisk = 'Low';
+  if (char4 === 7 || char4 === 14) {
+    issues.push({
+      title: 'Outdated Server Software Version',
+      risk: 'Medium',
+      description: 'The web server is broadcasting an older software version header in its HTTP responses.',
+      mitigation: 'Update the server software and configure it to omit version headers.'
+    });
+  }
 
-  // If no issues were added but score is 0
-  if (issues.length === 0) {
-    overallRisk = 'Safe';
+  // Determine overall risk realistically based on the highest severity issue
+  let overallRisk = 'Safe';
+  if (issues.length > 0) {
+    if (issues.some(i => i.risk === 'High')) {
+      overallRisk = 'High';
+    } else if (issues.some(i => i.risk === 'Medium')) {
+      overallRisk = 'Medium';
+    } else {
+      overallRisk = 'Low';
+    }
   }
 
   return { issues, overallRisk };
